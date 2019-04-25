@@ -10,9 +10,11 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
 class TweetsController extends Controller
 {
+  public $id, replyToUser, replyToId;
     public function index()
     {
-        $this->getTweets();
+        $tweets =$this->getTweets();
+        return view('tweets', compact('tweets'));
     }
     public function getTweets()
     {
@@ -21,9 +23,9 @@ class TweetsController extends Controller
         $middleware = new Oauth1(
             [
             'consumer_key'    => config('services.twitter.consumer_key'),
-            'consumer_secret' => config('services.twitter.consumer_key'),
-            'token'           => config('services.twitter.consumer_key'),
-            'token_secret'    => config('services.twitter.consumer_key'),
+            'consumer_secret' => config('services.twitter.consumer_secret'),
+            'token'           => config('services.twitter.access_token'),
+            'token_secret'    => config('services.twitter.access_token_secret'),
             ]
         );
 
@@ -37,8 +39,51 @@ class TweetsController extends Controller
             ]
         );
 
-        // Set the "auth" request option to "oauth" to sign using oauth
-        $res = $client->get('statuses/mentions_timeline.json');
+          // Set the "auth" request option to "oauth" to sign using oauth
+        $res = $client->get(
+            'statuses/mentions_timeline.json',
+            [
+                'query'=> [
+                    'count'=>'20'
+                ]
+            ]
+
+        );
+        $data = collect(json_decode($res->getBody()))->all();
+        echo sizeof($data);
+        dd($data);
+
+
+
+
+
+
+
+
+
+
+    }
+    public function postTweets()
+    {
+      $this->data = $data
+
+      $tweet_id = isset($data['id_str']) ? $data['id_str'] : null;
+      $author = isset($data['user']['screen_name']) ? $data['user']['screen_name'] : null;
+      $replyTweet_id =isset($data['in_reply_to_status_id_str']) ? $data['in_reply_to_status_id_str'] : null;
+
+        $client =$this->client;
+        $res = $client->post();
+
+
+        for ($i=0; $i < sizeof($data) ; $i++)
+        {
+          if (isset($data)) {
+            [
+            'id'=>$tweet_id,
+            $author
+          ]
+            }
+        }
     }
 
 
