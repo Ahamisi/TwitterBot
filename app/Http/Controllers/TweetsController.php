@@ -10,7 +10,7 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
 class TweetsController extends Controller
 {
-  public $id, replyToUser, replyToId;
+  public $id, $replyToUser, $replyToId;
     public function index()
     {
         $tweets =$this->getTweets();
@@ -49,8 +49,8 @@ class TweetsController extends Controller
             ]
 
         );
-        $data = collect(json_decode($res->getBody()))->all();
-        echo sizeof($data);
+        $data = json_decode($res->getBody());
+        echo $data[1]->id;
         dd($data);
 
 
@@ -58,33 +58,29 @@ class TweetsController extends Controller
 
 
 
-
-
-
-
     }
-    public function postTweets()
-    {
-      $this->data = $data
-
-      $tweet_id = isset($data['id_str']) ? $data['id_str'] : null;
-      $author = isset($data['user']['screen_name']) ? $data['user']['screen_name'] : null;
-      $replyTweet_id =isset($data['in_reply_to_status_id_str']) ? $data['in_reply_to_status_id_str'] : null;
-
-        $client =$this->client;
-        $res = $client->post();
-
-
-        for ($i=0; $i < sizeof($data) ; $i++)
-        {
-          if (isset($data)) {
-            [
-            'id'=>$tweet_id,
-            $author
-          ]
-            }
-        }
-    }
+    // public function postTweets()
+    // {
+    // //   $this->data = $data
+    // //
+    // //   $tweet_id = isset($data['id_str']) ? $data['id_str'] : null;
+    // //   $author = isset($data['user']['screen_name']) ? $data['user']['screen_name'] : null;
+    // //   $replyTweet_id =isset($data['in_reply_to_status_id_str']) ? $data['in_reply_to_status_id_str'] : null;
+    // //
+    //     $client =$this->client;
+    //     $res = $client->post();
+    //
+    //
+    //     for ($i=0; $i < sizeof($data) ; $i++)
+    //     {
+    //       if (isset($data)) {
+    //         [
+    //         'id'=>$tweet_id,
+    //         $author
+    //       ]
+    //         }
+    //     }
+    // }
 
 
 
