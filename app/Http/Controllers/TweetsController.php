@@ -13,11 +13,19 @@ class TweetsController extends Controller
   public $id, $replyToUser, $replyToId;
     public function index()
     {
-        $tweets =$this->getTweets();
-        return view('tweets', compact('tweets'));
+        $tweetData =$this->getTweets();
+        return view('tweets', compact('tweetData'));
     }
     public function getTweets()
     {
+      $sinceId = 1;
+
+
+  //This will store the ID of the last tweet we get
+
+      $maxId= $sinceId;
+
+      //creates a middleware for authenticating requests
         $stack = HandlerStack::create();
 
         $middleware = new Oauth1(
@@ -44,14 +52,29 @@ class TweetsController extends Controller
             'statuses/mentions_timeline.json',
             [
                 'query'=> [
-                    'count'=>'20'
+                    'count'=>'20',
+                    'since_id'=>  $sinceId
                 ]
             ]
 
         );
+
+        $tweets = [];
         $data = json_decode($res->getBody());
-        echo $data[1]->id;
+
+        foreach ($data as $index => $mentions) {
+          // code...
+           $tweets[] = [
+             'id' => $data['id'],
+             'user_id' => $data['user']['id_str'],
+             'username' => $data['user']['screen_name'],
+           ]
+        }
         dd($data);
+        // if ($search->search_metadata->max_id_str > $max_id){
+        //         $maxId = $search->->max_id_str;
+        // }
+
 
 
 
@@ -61,25 +84,17 @@ class TweetsController extends Controller
     }
     // public function postTweets()
     // {
-    // //   $this->data = $data
-    // //
-    // //   $tweet_id = isset($data['id_str']) ? $data['id_str'] : null;
-    // //   $author = isset($data['user']['screen_name']) ? $data['user']['screen_name'] : null;
-    // //   $replyTweet_id =isset($data['in_reply_to_status_id_str']) ? $data['in_reply_to_status_id_str'] : null;
-    // //
-    //     $client =$this->client;
-    //     $res = $client->post();
+    //   $data = $this->data;
     //
+    //   foreach ($data as $tweet) {
+    //     // code...
+    //     $res = $client->post('/statuses/update',
+    //     [
+    //       'status' => '@'.$tweet->from_user.' '.$reply,
+		// 		  'in_reply_to_status_id' => $tweet->id_str
+    //     ])
+    //   }
     //
-    //     for ($i=0; $i < sizeof($data) ; $i++)
-    //     {
-    //       if (isset($data)) {
-    //         [
-    //         'id'=>$tweet_id,
-    //         $author
-    //       ]
-    //         }
-    //     }
     // }
 
 
