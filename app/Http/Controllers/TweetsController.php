@@ -10,7 +10,7 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
 class TweetsController extends Controller
 {
-    public $reply= 'you mentioned me, beautiful day it is today, do have a great day!';
+    public $reply= 'you mentioned me, beautiful day it is today. Do have a great day!';
     protected $client;
 
     public function index()
@@ -51,36 +51,36 @@ class TweetsController extends Controller
 
       $sinceId = 1;
 
-
-
-
           // Set the "auth" request option to "oauth" to sign using oauth
         $res = $this->client->get(
             'statuses/mentions_timeline.json',
             [
                 'query'=> [
                     'count'=>'20',
-                    'since_id'=>  $sinceId
+                    'since_id'=>  $sinceId //retrieves tweets since this particular id
                 ]
             ]
 
         );
 
         $data = json_decode($res->getBody());
-        //get the number of tweets returned and set it as the new sinceId
+
+        //get the number of tweets returned, reduce it by 1 and set it as the new sinceId
+
         $tweetcount = sizeof($data);
         $sinceId = $data[$tweetcount - 1]->id;
 
 
         $tweets = [];
         foreach ($data as $index => $mentions) {
-          // code...
+
+          // pushes the data retrieved into an array
+
           array_push($tweets,[
             'id' => !empty($mentions->id) ? $mentions->id : '',
             'username' => !empty($mentions->user) ? $mentions->user->screen_name : ''
           ]);
         };
-        // echo ($sinceId);
         return $tweets;
     }
 
@@ -91,7 +91,7 @@ class TweetsController extends Controller
         // code...
         $res = $this->client->post('statuses/update.json',[
           'query' => [
-            'status' => '@'.$tweet['username'].' Hi,There '.$this->reply,
+            'status' => '@'.$tweet['username'].' Hi there, '.$this->reply,
   				  'in_reply_to_status_id' => $tweet['id'],
           ]
         ]);
