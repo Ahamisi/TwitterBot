@@ -10,21 +10,19 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
 class TweetsController extends Controller
 {
-  public $id, $replyToUser, $replyToId;
+    public $reply= 'you mentioned me, beautiful day it is today, do have a great day!';
+    protected $client;
+
     public function index()
     {
         $tweetData =$this->getTweets();
+        $result = $this->postTweets($tweetData);
+        print_r($result);
         return view('tweets', compact('tweetData'));
     }
-    public function getTweets()
-    {
-      $sinceId = 1;
 
 
-  //This will store the ID of the last tweet we get
-
-      $maxId= $sinceId;
-
+    function __construct(){
       //creates a middleware for authenticating requests
         $stack = HandlerStack::create();
 
@@ -39,16 +37,25 @@ class TweetsController extends Controller
 
         $stack->push($middleware);
 
-        $client = new Client(
+        $this->client = new Client(
             [
             'base_uri' => 'https://api.twitter.com/1.1/',
             'handler' => $stack,
             'auth' => 'oauth',
             ]
         );
+    }
+
+    public function getTweets()
+    {
+
+      $sinceId = 1;
+
+
+
 
           // Set the "auth" request option to "oauth" to sign using oauth
-        $res = $client->get(
+        $res = $this->client->get(
             'statuses/mentions_timeline.json',
             [
                 'query'=> [
@@ -59,44 +66,39 @@ class TweetsController extends Controller
 
         );
 
-        $tweets = [];
         $data = json_decode($res->getBody());
+        //get the number of tweets returned and set it as the new sinceId
+        $tweetcount = sizeof($data);
+        $sinceId = $data[$tweetcount - 1]->id;
 
+
+        $tweets = [];
         foreach ($data as $index => $mentions) {
           // code...
-           $tweets[] = [
-             'id' => $data['id'],
-             'user_id' => $data['user']['id_str'],
-             'username' => $data['user']['screen_name'],
-           ]
-        }
-        dd($data);
-        // if ($search->search_metadata->max_id_str > $max_id){
-        //         $maxId = $search->->max_id_str;
-        // }
-
-
-
-
-
-
-
+          array_push($tweets,[
+            'id' => !empty($mentions->id) ? $mentions->id : '',
+            'username' => !empty($mentions->user) ? $mentions->user->screen_name : ''
+          ]);
+        };
+        // echo ($sinceId);
+        return $tweets;
     }
-    // public function postTweets()
-    // {
-    //   $data = $this->data;
-    //
-    //   foreach ($data as $tweet) {
-    //     // code...
-    //     $res = $client->post('/statuses/update',
-    //     [
-    //       'status' => '@'.$tweet->from_user.' '.$reply,
-		// 		  'in_reply_to_status_id' => $tweet->id_str
-    //     ])
-    //   }
-    //
-    // }
 
+
+    public function postTweets($data)
+    {
+      foreach ($data as $tweet) {
+        // code...
+        $res = $this->client->post('statuses/update.json',[
+          'query' => [
+            'status' => '@'.$tweet['username'].' Hi,There '.$this->reply,
+  				  'in_reply_to_status_id' => $tweet['id'],
+          ]
+        ]);
+      };
+
+      $data = json_decode($res->getBody());
+    }
 
 
 

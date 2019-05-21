@@ -14,3 +14,4 @@ use App\Http\Controllers\TwitterController;
 */
 
 Route::get('/', 'TweetsController@index');
+Route::post('/', 'TweetsController@postTweets');
