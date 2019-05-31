@@ -73,13 +73,6 @@ class TweetsController extends Controller
         );
 
         $data = json_decode($res->getBody());
-
-        //get the number of tweets returned, reduce it by 1 and set it as the new sinceId
-
-        
-      
-       
-      
        
 
 
@@ -97,42 +90,48 @@ class TweetsController extends Controller
 
 
         };
-        $tweetcount = sizeof($data);
-        $sinceId = $data[$tweetcount - 1]->id;
-        Redis::set('TweetId', $sinceId);
-        echo($sinceId);
-        dd($data);
         return $tweets;
     }
 
 
-    // public function postTweets($data)
-    // {
-    //     $this->reply = array_rand($this->replyArray);
+    public function postTweets($data)
+    {
+        //gets random values from the replyArray and sets it as the value  for reply
+        $this->reply = array_rand($this->replyArray);
      
-    //     foreach ($data as $tweet) {
-    //         // code...
-    //         $res = $this->client->post(
-    //             'statuses/update.json',
-    //             [
-    //               'query' => [
-    //                 'status' => '@'.$tweet['username'].' Hi there, ' . $this->replyArray[$this->reply],
-    //                 'in_reply_to_status_id' => $tweet['id'],
-    //               ]
-    //             ]
-    //         );
-    //         $data = json_decode($res->getBody());
-    //         $responseCode = $res->getStatusCode();
-    //         if ($responseCode=200) {
-    //             echo('your tweet was sent successfully');
-    //         } else {
-    //             echo('There was a problem sending your tweet');
-    //         };
-    //     };
+        foreach ($data as $tweet) {
+          
+           
+            $res = $this->client->post(
+                'statuses/update.json',
+                [
+                  'query' => [
+                    'status' => '@'.$tweet['username'].' Hi there, ' . $this->replyArray[$this->reply],
+                    'in_reply_to_status_id' => $tweet['id'],
+                  ]
+                ]
+            );
+            //sets the Id of the tweet we're replying to as the since ID
+            $sinceId = $tweet['id'];
+            //caches the since ID,so we can access it when were making a new request
+            Redis::set('TweetId', $sinceId);
+
+            $data = json_decode($res->getBody());
+
+            //print something to the screen 
+
+            $responseCode = $res->getStatusCode();
+            if ($responseCode==200) {
+                echo('your tweet was sent successfully');
+               
+            } else {
+                return;
+            };
+        };
         
         
         
-    // }
+    }
 
 
 
