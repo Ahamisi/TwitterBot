@@ -1,19 +1,19 @@
-# Tweety
+# TwitterBot
 
-This is a basic Twitter bot
+This is a basic Twitter bot built with laravel
 
 ## Installation
 
 To install, clone the repository to your preferred location on your machine:
 
 ```
-$ git clone git@github.com:Jolaolu/Tweety.git tweety
+$ git clone git@github.com:Jolaolu/TwitterBot.git twitterBot
 ```
 
 Next, `cd` to the directory of the project.
 
 ```
-$ cd tweety
+$ cd twitterBot
 ```
 
 
@@ -53,3 +53,6 @@ $ php artisan serve
 
 Then check it on http://localhost:8000
 
+### Todos
+
+[Things still to be implement](Todo.md)
