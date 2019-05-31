@@ -55,4 +55,4 @@ Then check it on http://localhost:8000
 
 ### Todos
 
-[Things still to be implement](Todo.md)
+[Things still to be implemented](Todo.md)
