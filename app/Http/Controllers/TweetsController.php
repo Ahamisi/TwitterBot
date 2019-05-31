@@ -74,64 +74,65 @@ class TweetsController extends Controller
 
         $data = json_decode($res->getBody());
 
-        //get the number of tweets returned then checks if there is a new tweet
+        //get the number of tweets returned, reduce it by 1 and set it as the new sinceId
 
-        $tweetcount = sizeof($data);
+        
       
-        if ($tweetcount == 0 ) {
-            echo('No new tweets, try again later');
-            return; 
-        } else {
-                Redis::set('TweetId', $sinceId);
-            
+       
+      
+       
 
 
-            $tweets = [];
-            foreach ($data as $index => $mentions) {
+        $tweets = [];
+        foreach ($data as $index => $mentions) {
 
-                    // pushes the data retrieved into an array
+            // pushes the data retrieved into an array
 
-                    array_push($tweets,
-                        [
-                        'id' => !empty($mentions->id) ? $mentions->id : '',
-                        'username' => !empty($mentions->user) ? $mentions->user->screen_name : '',
-                        ]
-                    );
-
-
-            };
-                return $tweets;
-        }
-    }
-
-
-    public function postTweets($data)
-    {
-        $this->reply = array_rand($this->replyArray);
-     
-        foreach ($data as $tweet) {
-            // code...
-            $res = $this->client->post(
-                'statuses/update.json',
+            array_push($tweets,
                 [
-                  'query' => [
-                    'status' => '@'.$tweet['username'].' Hi there, ' . $this->replyArray[$this->reply],
-                    'in_reply_to_status_id' => $tweet['id'],
-                  ]
+                  'id' => !empty($mentions->id) ? $mentions->id : '',
+                  'username' => !empty($mentions->user) ? $mentions->user->screen_name : '',
                 ]
             );
-            $data = json_decode($res->getBody());
-            $responseCode = $res->getStatusCode();
-            if ($responseCode=200) {
-                echo('your tweet was sent successfully');
-            } else {
-                echo('There was a problem sending your tweet');
-            };
+
+
         };
-        
-        
-        
+        $tweetcount = sizeof($data);
+        $sinceId = $data[$tweetcount - 1]->id;
+        Redis::set('TweetId', $sinceId);
+        echo($sinceId);
+        dd($data);
+        return $tweets;
     }
+
+
+    // public function postTweets($data)
+    // {
+    //     $this->reply = array_rand($this->replyArray);
+     
+    //     foreach ($data as $tweet) {
+    //         // code...
+    //         $res = $this->client->post(
+    //             'statuses/update.json',
+    //             [
+    //               'query' => [
+    //                 'status' => '@'.$tweet['username'].' Hi there, ' . $this->replyArray[$this->reply],
+    //                 'in_reply_to_status_id' => $tweet['id'],
+    //               ]
+    //             ]
+    //         );
+    //         $data = json_decode($res->getBody());
+    //         $responseCode = $res->getStatusCode();
+    //         if ($responseCode=200) {
+    //             echo('your tweet was sent successfully');
+    //         } else {
+    //             echo('There was a problem sending your tweet');
+    //         };
+    //     };
+        
+        
+        
+    // }
 
 
 
